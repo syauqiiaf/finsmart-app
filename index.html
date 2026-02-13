@@ -119,6 +119,18 @@
                 submitBtn.disabled = false;
             });
         });
+    // Tambahkan fungsi ini di dalam tag <script> kamu
+function updateSaldo() {
+    fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+        // Mengganti teks saldo di dashboard
+        document.querySelector('h2').innerText = "Rp " + data.saldo.toLocaleString('id-ID');
+    });
+}
+
+// Jalankan fungsi ini setiap kali aplikasi dibuka
+window.onload = updateSaldo;
     </script>
 </body>
 </html>
