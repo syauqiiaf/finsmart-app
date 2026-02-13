@@ -3,27 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinSmart Mini</title>
+    <title>FinSmart Mini Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
         .card-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); }
-        .nav-active { color: #2563eb; }
         .tab-content { display: none; }
         .tab-active { display: block; }
+        .nav-active { color: #2563eb; font-weight: bold; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28">
 
     <div id="home" class="tab-content tab-active">
         <div class="card-gradient p-8 rounded-b-[3rem] shadow-2xl text-white text-center">
-            <h1 class="text-xl font-bold italic">FinSmart Mini</h1>
-            <p class="text-blue-100 text-sm opacity-80 uppercase mt-4">Total Saldo</p>
-            <h2 class="text-4xl font-black mt-1 mb-6">Rp 25.450.000</h2>
+            <h1 class="text-xl font-bold italic tracking-tighter">FinSmart Mini</h1>
+            <p class="text-blue-200 text-[10px] mt-4 uppercase tracking-widest">Saldo Saat Ini</p>
+            <h2 id="displaySaldo" class="text-4xl font-black mt-1 mb-2">Rp 0</h2>
         </div>
-        <div class="p-8 text-center text-slate-400 text-sm">
-            Klik tab "Catat" di bawah untuk transaksi baru.
+
+        <div class="px-6 mt-6">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <h3 class="font-bold text-slate-800 mb-4 text-xs flex items-center">
+                    <i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Alokasi Pengeluaran
+                </h3>
+                <canvas id="expenseChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="px-6 mt-6">
+            <h3 class="font-bold text-slate-800 mb-3 text-xs">Portofolio & Fondasi</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 text-center">
+                    <i class="fas fa-coins text-amber-500 mb-1"></i>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Emas Fisik</p>
+                    <p class="font-black text-slate-800">13.5 Gr</p>
+                </div>
+                <div class="bg-white p-4 rounded-3xl shadow-sm border-l-4 border-red-500">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Dana Darurat</p>
+                    <p class="font-black text-red-600">33%</p>
+                    <div class="w-full bg-slate-100 h-1 mt-1 rounded-full"><div class="bg-red-500 h-1 rounded-full" style="width: 33%"></div></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -31,106 +54,125 @@
         <h3 class="font-bold text-slate-800 mb-6 text-xl text-center">Catat Transaksi</h3>
         <form id="financeForm" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
-                <button type="button" onclick="setType('Pengeluaran')" id="btnKeluar" class="py-3 rounded-2xl border-2 border-red-500 text-red-500 font-bold bg-red-50 text-xs">PENGELUARAN</button>
+                <button type="button" onclick="setType('Pengeluaran')" id="btnKeluar" class="py-3 rounded-2xl border-2 border-red-500 text-red-500 font-bold bg-red-50 text-xs shadow-sm">PENGELUARAN</button>
                 <button type="button" onclick="setType('Pemasukan')" id="btnMasuk" class="py-3 rounded-2xl border-2 border-slate-200 text-slate-400 font-bold text-xs">PEMASUKAN</button>
             </div>
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                <label class="text-[10px] uppercase font-bold text-slate-400">Nominal (Rp)</label>
-                <input type="number" id="nominal" placeholder="Contoh: 50000" class="w-full text-2xl font-bold outline-none mt-1" required>
+                <label class="text-[10px] uppercase font-bold text-slate-400">Nominal</label>
+                <input type="number" id="nominal" placeholder="0" class="w-full text-2xl font-bold outline-none mt-1" required>
             </div>
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                 <label class="text-[10px] uppercase font-bold text-slate-400">Kategori</label>
                 <select id="kategori" class="w-full bg-transparent font-medium outline-none mt-1">
                     <option value="Makanan">🍱 Makanan</option>
                     <option value="Transportasi">🚗 Transportasi</option>
+                    <option value="Investasi">🟡 Investasi Emas</option>
                     <option value="Dana Darurat">🛡️ Dana Darurat</option>
                     <option value="Lainnya">✨ Lainnya</option>
                 </select>
             </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg mt-4">Simpan</button>
+            <button type="submit" class="w-full card-gradient text-white py-4 rounded-2xl font-bold shadow-lg mt-4">SIMPAN DATA</button>
         </form>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 flex justify-around py-4 rounded-t-[2rem]">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 flex justify-around py-5 rounded-t-[2.5rem] shadow-2xl">
         <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center nav-active">
-            <i class="fas fa-th-large text-lg"></i>
-            <span class="text-[10px] mt-1 font-bold">HOME</span>
+            <i class="fas fa-chart-line text-lg"></i>
+            <span class="text-[9px] mt-1 font-bold">DASHBOARD</span>
         </button>
         <button onclick="switchTab('transactions')" id="nav-transactions" class="flex flex-col items-center text-slate-400">
-            <i class="fas fa-edit text-lg"></i>
-            <span class="text-[10px] mt-1 font-bold">CATAT</span>
+            <i class="fas fa-plus-circle text-lg"></i>
+            <span class="text-[9px] mt-1 font-bold">CATAT</span>
         </button>
     </nav>
 
     <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJEV95k-eJguKH_yVzN6zN72GDSNYmlM0_9WnsZmpbZ2Ur1I9555E-YkfpvWywTlMy/exec";
         let currentType = 'Pengeluaran';
-        // GANTI DI SINI:
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2SPr76A6R3mxA9IL8NV1DFvKls7fmylg7mVYi8p1WjXVpiHzqHpBC8kmtp1zNAgC1/exec";
+        let myChart = null;
+
+        function updateDashboard() {
+            const display = document.getElementById('displaySaldo');
+            display.innerText = "Wait...";
+            
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    display.innerText = "Rp " + data.saldo.toLocaleString('id-ID');
+                    renderChart(data.grafik);
+                });
+        }
+
+        function renderChart(grafikData) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const labels = Object.keys(grafikData);
+            const values = Object.values(grafikData);
+
+            if (myChart) myChart.destroy(); // Hapus grafik lama sebelum update
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#4f46e5', '#ef4444', '#f59e0b', '#10b981', '#6366f1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+                }
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
+            document.querySelectorAll('nav button').forEach(b => { b.classList.remove('nav-active'); b.classList.add('text-slate-400'); });
+            document.getElementById(tabId).classList.add('tab-active');
+            document.getElementById('nav-' + tabId).classList.add('nav-active');
+            document.getElementById('nav-' + tabId).classList.remove('text-slate-400');
+            if(tabId === 'home') updateDashboard();
+        }
 
         function setType(type) {
             currentType = type;
             const btnMasuk = document.getElementById('btnMasuk');
             const btnKeluar = document.getElementById('btnKeluar');
             if(type === 'Pemasukan') {
-                btnMasuk.className = 'py-3 rounded-2xl border-2 border-green-500 text-green-500 font-bold bg-green-50 text-xs';
+                btnMasuk.className = 'py-3 rounded-2xl border-2 border-green-500 text-green-500 font-bold bg-green-50 text-xs shadow-sm';
                 btnKeluar.className = 'py-3 rounded-2xl border-2 border-slate-200 text-slate-400 font-bold text-xs';
             } else {
-                btnKeluar.className = 'py-3 rounded-2xl border-2 border-red-500 text-red-500 font-bold bg-red-50 text-xs';
+                btnKeluar.className = 'py-3 rounded-2xl border-2 border-red-500 text-red-500 font-bold bg-red-50 text-xs shadow-sm';
                 btnMasuk.className = 'py-3 rounded-2xl border-2 border-slate-200 text-slate-400 font-bold text-xs';
             }
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('nav-active');
-                b.classList.add('text-slate-400');
-            });
-            document.getElementById(tabId).classList.add('tab-active');
-            document.getElementById('nav-' + tabId).classList.add('nav-active');
-            document.getElementById('nav-' + tabId).classList.remove('text-slate-400');
         }
 
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.innerText = "Mengirim...";
+            submitBtn.innerText = "Proses...";
             submitBtn.disabled = true;
-
-            const data = {
-                nominal: document.getElementById('nominal').value,
-                kategori: document.getElementById('kategori').value,
-                jenis: currentType
-            };
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify(data)
-            })
-            .then(() => {
-                alert("Berhasil! Cek Google Sheets kamu.");
+                body: JSON.stringify({
+                    nominal: document.getElementById('nominal').value,
+                    kategori: document.getElementById('kategori').value,
+                    jenis: currentType
+                })
+            }).then(() => {
+                alert("Tersimpan!");
                 e.target.reset();
                 switchTab('home');
-            })
-            .catch(err => alert("Error: " + err))
-            .finally(() => {
-                submitBtn.innerText = "Simpan";
+            }).finally(() => {
+                submitBtn.innerText = "SIMPAN DATA";
                 submitBtn.disabled = false;
             });
         });
-    // Tambahkan fungsi ini di dalam tag <script> kamu
-function updateSaldo() {
-    fetch(SCRIPT_URL)
-    .then(res => res.json())
-    .then(data => {
-        // Mengganti teks saldo di dashboard
-        document.querySelector('h2').innerText = "Rp " + data.saldo.toLocaleString('id-ID');
-    });
-}
 
-// Jalankan fungsi ini setiap kali aplikasi dibuka
-window.onload = updateSaldo;
+        window.onload = updateDashboard;
     </script>
 </body>
 </html>
