@@ -19,8 +19,7 @@
     <div id="home" class="tab-content tab-active">
         <div class="p-8 text-center bg-gradient-to-br from-blue-600 to-indigo-900 rounded-b-[3rem] shadow-2xl mb-8">
             <h1 class="text-2xl font-black italic tracking-tighter">FinSmart Manager</h1>
-            <p class="text-blue-200 text-[10px] mt-4 uppercase tracking-[0.3em]">Net Worth Overview</p>
-            <h2 id="balance" class="text-4xl font-black mt-2 text-white">Rp 0</h2>
+            <h2 id="balance" class="text-4xl font-black mt-4 text-white">Rp 0</h2>
             
             <div class="grid grid-cols-2 gap-4 mt-8">
                 <div class="glass p-4 rounded-3xl">
@@ -28,15 +27,20 @@
                     <p id="totalIn" class="text-sm font-bold text-green-400">Rp 0</p>
                 </div>
                 <div class="glass p-4 rounded-3xl">
-                    <p class="text-[9px] text-blue-300 font-bold uppercase">Pengeluaran</p>
+                    <p class="text-[9px] text-blue-300 font-bold uppercase">Terpakai</p>
                     <p id="totalOut" class="text-sm font-bold text-red-400">Rp 0</p>
                 </div>
             </div>
         </div>
 
         <div class="px-6 space-y-6">
+            <div id="warningBox" class="hidden bg-red-500/20 border border-red-500 p-4 rounded-2xl flex items-center">
+                <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                <p class="text-[10px] font-bold text-red-200">WASPADA: Pengeluaran melebihi 50% pemasukan!</p>
+            </div>
+
             <div class="glass p-6 rounded-[2.5rem]">
-                <h3 class="text-[10px] font-bold text-slate-400 mb-4 uppercase tracking-widest text-center">Alokasi Dana</h3>
+                <h3 class="text-[10px] font-bold text-slate-400 mb-4 uppercase text-center tracking-widest">Struktur Pengeluaran</h3>
                 <canvas id="mainChart"></canvas>
             </div>
 
@@ -60,7 +64,7 @@
     </nav>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_-zm5Ocy7L6ROQuA3_Ww2Cm4ZuOAzzJZevzcpBxxC2-R1L9T5V21vBrqazn9j0FTw-w/exec"; // GANTI INI!
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzehTDASO0rqR2Mvn2fuTo1gxxTV6YBAn18WsuqA0nsLS8dAU_P-4VGnK-6E0Y8iMIZ-g/exec"; //
 
         function loadData() {
             fetch(SCRIPT_URL)
@@ -70,24 +74,28 @@
                     document.getElementById('totalIn').innerText = "Rp " + data.in.toLocaleString('id-ID');
                     document.getElementById('totalOut').innerText = "Rp " + data.out.toLocaleString('id-ID');
                     
-                    // Update Dana Darurat Guide
-                    const status = "lajang"; // Nanti bisa diambil dari setting
-                    const target = status === "lajang" ? 6 : (status === "menikah" ? 9 : 12);
-                    document.getElementById('efGuide').innerText = `Berdasarkan status Anda, target dana darurat ideal adalah ${target}x pengeluaran bulanan.`;
+                    // Logika Peringatan 50%
+                    if (data.out > (data.in * 0.5)) {
+                        document.getElementById('warningBox').classList.remove('hidden');
+                    }
+
+                    // Dana Darurat Guide
+                    const target = 6; // Default lajang
+                    document.getElementById('efGuide').innerText = `Target dana darurat ideal Anda adalah ${target}x pengeluaran.`;
                     
-                    renderChart(data);
+                    renderChart(data.grafik);
                 });
         }
 
-        function renderChart(data) {
+        function renderChart(grafikData) {
             const ctx = document.getElementById('mainChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Sisa', 'Terpakai', 'Aset'],
+                    labels: Object.keys(grafikData),
                     datasets: [{
-                        data: [data.saldo, data.out, 1000000], // Angka aset placeholder
-                        backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b'],
+                        data: Object.values(grafikData),
+                        backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#6366f1'],
                         borderWidth: 0
                     }]
                 },
