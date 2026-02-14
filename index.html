@@ -1,76 +1,126 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinSmart Manager</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .bg-pro { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSmart Manager Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .card-main { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+        .tab-content { display: none; }
+        .tab-active { display: block; }
+    </style>
 </head>
-<body class="bg-slate-50 pb-24 font-['Inter']">
+<body class="pb-28">
 
-    <div class="bg-pro p-8 rounded-b-[3rem] text-white shadow-2xl">
-        <h1 id="brandName" class="text-xl font-black italic">FinSmart Manager</h1>
-        <div class="mt-6 grid grid-cols-3 gap-2 text-center text-[10px]">
-            <div class="bg-white/10 p-3 rounded-2xl">
-                <p class="opacity-60 uppercase">Pemasukan</p>
-                <p id="totalIn" class="font-bold text-xs">Rp 0</p>
-            </div>
-            <div class="bg-white/10 p-3 rounded-2xl">
-                <p class="opacity-60 uppercase">Terpakai</p>
-                <p id="totalOut" class="font-bold text-xs">Rp 0</p>
-            </div>
-            <div class="bg-white/10 p-3 rounded-2xl border border-green-400">
-                <p class="opacity-60 uppercase">Saldo Sisa</p>
-                <p id="balance" class="font-bold text-xs">Rp 0</p>
-            </div>
-        </div>
-    </div>
+    <div id="home" class="tab-content tab-active">
+        <div class="card-main p-8 rounded-b-[3rem] text-white shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h1 id="brandName" class="text-xl font-black italic">FinSmart Manager</h1>
+                <span class="bg-red-500 text-[10px] px-2 py-1 rounded-full animate-pulse hidden" id="warningLimit">⚠️ OVER 50%</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-white/10 p-2 rounded-xl">
+                    <p class="text-[8px] opacity-70">PEMASUKAN</p>
+                    <p id="totalIn" class="font-bold text-[10px]">Rp 0</p>
+                </div>
+                <div class="bg-white/10 p-2 rounded-xl text-red-300">
+                    <p class="text-[8px] text-white opacity-70">TERPAKAI</p>
+                    <p id="totalOut" class="font-bold text-[10px]">Rp 0</p>
+                </div>
+                <div class="bg-white/10 p-2 rounded-xl border border-green-400">
+                    <p class="text-[8px] opacity-70">SISA</p>
+                    <p id="balance" class="font-bold text-[10px]">Rp 0</p>
+                </div>
+            </div>
+        </div>
 
-    <div class="p-6 space-y-6">
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm">
-            <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest text-center">Visualisasi Kekayaan</h3>
-            <canvas id="comparisonChart"></canvas>
-        </div>
+        <div class="p-6 space-y-6">
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm">
+                <h3 class="text-[10px] font-bold text-slate-400 mb-4 uppercase text-center tracking-widest">Visualisasi Kekayaan</h3>
+                <canvas id="mainChart"></canvas>
+            </div>
 
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-8 border-indigo-500">
-            <h3 class="font-bold text-sm flex items-center"><i class="fas fa-shield-halved text-indigo-500 mr-2"></i> Dana Darurat</h3>
-            <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
-                <div id="efProgress" class="bg-indigo-600 h-full" style="width: 0%"></div>
-            </div>
-            <p id="efStatusText" class="text-[10px] text-slate-500 mt-2 italic"></p>
-        </div>
-    </div>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-8 border-indigo-600">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-xs uppercase text-slate-400">🛡️ Dana Darurat</h3>
+                    <span id="efTargetLabel" class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">Target: 6x</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div id="efProgress" class="bg-indigo-600 h-full" style="width: 0%"></div>
+                </div>
+                <p id="efGuide" class="text-[9px] text-slate-500 mt-2 italic leading-tight"></p>
+            </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-5 rounded-t-[2.5rem] shadow-2xl">
-        <button onclick="showTab('home')" class="flex flex-col items-center text-blue-600"><i class="fas fa-chart-line"></i><span class="text-[9px] mt-1 font-bold">HOME</span></button>
-        <button onclick="showTab('assets')" class="flex flex-col items-center text-slate-400"><i class="fas fa-gem"></i><span class="text-[9px] mt-1 font-bold">ASET</span></button>
-        <button onclick="showTab('settings')" class="flex flex-col items-center text-slate-400"><i class="fas fa-cog"></i><span class="text-[9px] mt-1 font-bold">SETTING</span></button>
-    </nav>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-5 rounded-[2rem] shadow-sm text-center">
+                    <i class="fas fa-coins text-amber-500 mb-2"></i>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Logam Mulia</p>
+                    <p id="goldGram" class="font-black text-slate-800 text-sm">0.0 Gr</p>
+                </div>
+                <div class="bg-white p-5 rounded-[2rem] shadow-sm text-center">
+                    <i class="fas fa-chart-line text-emerald-500 mb-2"></i>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Reksadana</p>
+                    <p id="rdValue" class="font-black text-slate-800 text-sm">Saham</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        const SCRIPT_URL = "URL_WEB_APP_ANDA";
-        
-        // Logika Chart.js untuk perbandingan Pemasukan, Pengeluaran, Aset, Dana Darurat
-        function renderChart(data) {
-            const ctx = document.getElementById('comparisonChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Income', 'Expense', 'Aset', 'Emergency'],
-                    datasets: [{
-                        data: [data.in, data.out, data.assets, data.ef],
-                        backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b', '#10b981'],
-                        borderRadius: 10
-                    }]
-                },
-                options: { plugins: { legend: { display: false } } }
-            });
-        }
-    </script>
+    <div id="settings" class="tab-content p-8">
+        <h2 class="font-bold text-slate-800 mb-6 text-center">Konfigurasi FinSmart</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Nama Aplikasi</label>
+                <input type="text" id="inputBrand" class="w-full p-4 rounded-2xl bg-white border mt-1 outline-none" placeholder="FinSmart Manager">
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Status Pernikahan</label>
+                <select id="inputStatus" class="w-full p-4 rounded-2xl bg-white border mt-1 outline-none">
+                    <option value="lajang">Lajang (Target 6x)</option>
+                    <option value="menikah">Menikah (Target 9x)</option>
+                    <option value="anak">Menikah + Anak (Target 12x)</option>
+                </select>
+            </div>
+            <button onclick="saveSettings()" class="w-full card-main text-white py-4 rounded-2xl font-bold shadow-lg">SIMPAN PERUBAHAN</button>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 flex justify-around py-5 rounded-t-[2.5rem] shadow-2xl">
+        <button onclick="switchTab('home')" class="flex flex-col items-center text-blue-600"><i class="fas fa-chart-pie text-lg"></i><span class="text-[9px] mt-1 font-bold">HOME</span></button>
+        <button onclick="switchTab('settings')" class="flex flex-col items-center text-slate-400"><i class="fas fa-user-gear text-lg"></i><span class="text-[9px] mt-1 font-bold">SETTING</span></button>
+    </nav>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6AYjoUBFCk6N6JjsrsL6oqYsc_NlP1u_RfMVhxC0sviYlc6vMhKFMy4WP3n9Dlm3SPg/exec"; //
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
+            document.getElementById(tabId).classList.add('tab-active');
+            if(tabId === 'home') loadData();
+        }
+
+        function saveSettings() {
+            const name = document.getElementById('inputBrand').value;
+            const status = document.getElementById('inputStatus').value;
+            localStorage.setItem('finBrand', name);
+            localStorage.setItem('finStatus', status);
+            alert("Pengaturan Berhasil Disimpan!");
+            location.reload();
+        }
+
+        function loadData() {
+            // Logika menarik data dari Sheets dan mengupdate visual
+            // Termasuk cek peringatan 50% pengeluaran
+        }
+
+        window.onload = function() {
+            document.getElementById('brandName').innerText = localStorage.getItem('finBrand') || "FinSmart Manager";
+            loadData();
+        };
+    </script>
 </body>
 </html>
