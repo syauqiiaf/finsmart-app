@@ -1,108 +1,86 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinSmart Manager Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .tab-content { display: none; }
-        .tab-active { display: block; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSmart Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .card-top { background: #1a1a1a; height: 100px; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    </style>
 </head>
-<body class="pb-28">
+<body class="p-6 pb-28">
 
-    <div id="home" class="tab-content tab-active">
-        <div class="p-8 text-center bg-gradient-to-br from-blue-600 to-indigo-900 rounded-b-[3rem] shadow-2xl mb-8">
-            <h1 class="text-2xl font-black italic tracking-tighter">FinSmart Manager</h1>
-            <h2 id="balance" class="text-4xl font-black mt-4 text-white">Rp 0</h2>
-            
-            <div class="grid grid-cols-2 gap-4 mt-8">
-                <div class="glass p-4 rounded-3xl">
-                    <p class="text-[9px] text-blue-300 font-bold uppercase">Pemasukan</p>
-                    <p id="totalIn" class="text-sm font-bold text-green-400">Rp 0</p>
-                </div>
-                <div class="glass p-4 rounded-3xl">
-                    <p class="text-[9px] text-blue-300 font-bold uppercase">Terpakai</p>
-                    <p id="totalOut" class="text-sm font-bold text-red-400">Rp 0</p>
-                </div>
-            </div>
-        </div>
+    <h1 class="text-center font-bold text-sm mb-8 tracking-widest">FinSmart Manager</h1>
 
-        <div class="px-6 space-y-6">
-            <div id="warningBox" class="hidden bg-red-500/20 border border-red-500 p-4 rounded-2xl flex items-center">
-                <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
-                <p class="text-[10px] font-bold text-red-200">WASPADA: Pengeluaran melebihi 50% pemasukan!</p>
-            </div>
+    <div class="grid grid-cols-1 gap-4 mb-4">
+        <div class="card-top"><p class="text-[9px] text-gray-400 uppercase">Pemasukan</p><p id="totalIn" class="text-white font-bold">Rp 0</p></div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="card-top"><p class="text-[9px] text-gray-400 uppercase">Terpakai</p><p id="totalOut" class="text-red-500 font-bold">Rp 0</p></div>
+        <div class="card-top border border-green-500/30"><p class="text-[9px] text-gray-400 uppercase">Sisa</p><p id="balance" class="text-green-500 font-bold">Rp 0</p></div>
+    </div>
 
-            <div class="glass p-6 rounded-[2.5rem]">
-                <h3 class="text-[10px] font-bold text-slate-400 mb-4 uppercase text-center tracking-widest">Struktur Pengeluaran</h3>
-                <canvas id="mainChart"></canvas>
-            </div>
+    <div class="space-y-6">
+        <div class="glass p-6 rounded-3xl">
+            <h3 class="text-xs font-bold mb-4 uppercase tracking-tighter">🛡️ Dana Darurat (Simpan di RDPU)</h3>
+            <div class="w-full bg-white/10 h-2 rounded-full mb-2"><div id="efBar" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div></div>
+            <p id="efAlert" class="text-[9px] text-blue-300"></p>
+            <p class="text-[8px] text-gray-500 mt-2 italic">*Rekomendasi Ahli: Minimal 6x Pengeluaran untuk status Lajang.</p>
+        </div>
 
-            <div class="glass p-6 rounded-[2.5rem] border-l-4 border-blue-500">
-                <div class="flex justify-between items-center mb-2">
-                    <p class="text-xs font-bold text-blue-400">🛡️ Dana Darurat</p>
-                    <span id="targetTag" class="text-[8px] bg-blue-500/20 px-2 py-1 rounded-full text-blue-300">Target 6x</span>
-                </div>
-                <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                    <div id="efProgress" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <p id="efGuide" class="text-[9px] text-slate-400 mt-3 italic leading-relaxed"></p>
-            </div>
-        </div>
-    </div>
+        <div class="glass p-6 rounded-3xl">
+            <h3 class="text-xs font-bold mb-4 uppercase tracking-tighter text-center">Distribusi Aset</h3>
+            <canvas id="assetChart"></canvas>
+        </div>
+    </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 flex justify-around py-5 rounded-t-[2.5rem] shadow-2xl">
-        <button onclick="switchTab('home')" class="flex flex-col items-center text-blue-500"><i class="fas fa-chart-pie text-xl"></i><span class="text-[9px] mt-1 font-bold">HOME</span></button>
-        <button class="flex flex-col items-center text-slate-500"><i class="fas fa-gem text-xl"></i><span class="text-[9px] mt-1 font-bold">ASET</span></button>
-        <button class="flex flex-col items-center text-slate-500"><i class="fas fa-cog text-xl"></i><span class="text-[9px] mt-1 font-bold">SETTING</span></button>
-    </nav>
+    <nav class="fixed bottom-6 left-6 right-6 glass rounded-full flex justify-around py-4 shadow-2xl">
+        <i class="fas fa-th-large text-blue-500"></i>
+        <i class="fas fa-history text-gray-500"></i>
+        <i class="fas fa-user-cog text-gray-500"></i>
+    </nav>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzehTDASO0rqR2Mvn2fuTo1gxxTV6YBAn18WsuqA0nsLS8dAU_P-4VGnK-6E0Y8iMIZ-g/exec"; //
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoS033gdvg56X7Bs3nu7aWif1JcJiWd5bk6obvIUJmUnQEfer0Gu4yRefBZeGOFwKI/exec";
 
-        function loadData() {
-            fetch(SCRIPT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('balance').innerText = "Rp " + data.saldo.toLocaleString('id-ID');
-                    document.getElementById('totalIn').innerText = "Rp " + data.in.toLocaleString('id-ID');
-                    document.getElementById('totalOut').innerText = "Rp " + data.out.toLocaleString('id-ID');
-                    
-                    // Logika Peringatan 50%
-                    if (data.out > (data.in * 0.5)) {
-                        document.getElementById('warningBox').classList.remove('hidden');
-                    }
+        function loadData() {
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('balance').innerText = "Rp " + data.saldo.toLocaleString('id-ID');
+                    document.getElementById('totalIn').innerText = "Rp " + data.in.toLocaleString('id-ID');
+                    document.getElementById('totalOut').innerText = "Rp " + data.out.toLocaleString('id-ID');
+                    
+                    // Logic Dana Darurat & Alert
+                    const efProg = (data.ef / (data.out * 6)) * 100;
+                    document.getElementById('efBar').style.width = Math.min(efProg, 100) + "%";
+                    document.getElementById('efAlert').innerText = efProg >= 100 ? "🎉 Target Dana Darurat Tercapai!" : "⏳ Terkumpul " + efProg.toFixed(1) + "% dari target.";
 
-                    // Dana Darurat Guide
-                    const target = 6; // Default lajang
-                    document.getElementById('efGuide').innerText = `Target dana darurat ideal Anda adalah ${target}x pengeluaran.`;
-                    
-                    renderChart(data.grafik);
-                });
-        }
+                    renderChart(data);
+                });
+        }
 
-        function renderChart(grafikData) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(grafikData),
-                    datasets: [{
-                        data: Object.values(grafikData),
-                        backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#6366f1'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 9 } } } } }
-            });
-        }
-        window.onload = loadData;
-    </script>
+        function renderChart(data) {
+            new Chart(document.getElementById('assetChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Emas', 'Reksadana', 'Cash'],
+                    datasets: [{
+                        data: [data.gold, data.rd, data.saldo],
+                        backgroundColor: ['#f59e0b', '#10b981', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { plugins: { legend: { position: 'bottom', labels: { color: '#888', font: { size: 9 } } } } }
+            });
+        }
+        window.onload = loadData;
+    </script>
 </body>
 </html>
+
